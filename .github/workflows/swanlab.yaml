@@ -1,0 +1,30 @@
+name: Sync TensorBoard logs
+
+on:
+  push:
+    branches:
+      - temp
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install pillow swanlab tensorflow wandb
+
+      - name: Sync to SwanLab
+        env:
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+          SWANLAB_API_KEY: ${{ secrets.SWANLAB_API_KEY }}
+        run: wandb sync ./logs
+        # run: swanlab convert -p tensorboard --tb_logdir ./logs
